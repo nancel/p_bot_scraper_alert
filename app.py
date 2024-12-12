@@ -14,6 +14,7 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")  # ID del chat o grupo de Telegram
 TARGET_URL = "https://turnoslab.ar/vacuna-dengue-fechas.php"  # URL a consultar
 SEARCH_PATTERN = "Sin disponibilidad"  # Patrón a buscar en el HTML
+DNI=os.getenv("DNI")
 
 bot = Bot(token=TELEGRAM_TOKEN)
 app = Flask(__name__)
@@ -25,7 +26,7 @@ async def check_url_and_notify():
             form_data = {
                 "vacunatorio": "",
                 "dosis": "2",
-                "documento": "29815404"
+                "documento": DNI
             }
             async with session.post(TARGET_URL, data=form_data) as response:
                 if response.status != 200:
