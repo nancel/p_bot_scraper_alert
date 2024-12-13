@@ -1,6 +1,6 @@
 import os
-import aiohttp
 import asyncio
+import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from telegram import Bot
@@ -20,30 +20,27 @@ bot = Bot(token=TELEGRAM_TOKEN)
 app = Flask(__name__)
 
 async def check_url_and_notify():
-    async with aiohttp.ClientSession() as session:
-        try:
-            # Enviar datos form-data
-            form_data = {
-                "vacunatorio": "1",
-                "dosis": "2",
-                "documento": DNI
-            }
-            async with session.post(TARGET_URL, data=form_data) as response:
-                if response.status != 200:
-                    raise Exception(f"Error en la solicitud: {response.status}")
-                
-                html = await response.text()
-                soup = BeautifulSoup(html, "html.parser")
+    try:
+        # Enviar datos form-data
+        form_data = {
+            "vacunatorio": "1",
+            "dosis": "2",
+            "documento": DNI
+        }
+        response = requests.post(TARGET_URL, data=form_data)
+        response.raise_for_status()
 
-                # Verificar si el texto "Sin disponibilidad" está presente
-                if "Sin disponibilidad" not in soup.text:
-                    # Enviar mensaje si no está
-                    await bot.send_message(chat_id=CHAT_ID, text=f"¡Disponibilidad detectada!")
-                else:
-                    print("Aún no hay disponibilidad.")
+        soup = BeautifulSoup(response.text, "html.parser")
 
-        except Exception as e:
-            await bot.send_message(chat_id=CHAT_ID, text=f"Error: {e}")
+        # Verificar si el texto "Sin disponibilidad" está presente
+        if "Sin disponibilidad" not in soup.text:
+            # Enviar mensaje si no está
+            await bot.send_message(chat_id=CHAT_ID, text=f"¡Disponibilidad detectada!")
+        else:
+            print("Aún no hay disponibilidad.")
+
+    except Exception as e:
+        await bot.send_message(chat_id=CHAT_ID, text=f"Error: {e}")
 
 async def periodic_task(interval):
     while True:
