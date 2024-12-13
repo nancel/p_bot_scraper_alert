@@ -24,7 +24,7 @@ async def check_url_and_notify():
         try:
             # Enviar datos form-data
             form_data = {
-                "vacunatorio": "",
+                "vacunatorio": "1",
                 "dosis": "2",
                 "documento": DNI
             }
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     # Configurar asyncio para ejecutar la tarea periódicatry:
     loop = asyncio.new_event_loop()  # Crear un nuevo bucle de eventos
     asyncio.set_event_loop(loop)    # Establecerlo como el bucle actual
-    loop.create_task(periodic_task(15 * 60))  # Ejecutar la tarea cada 15 minutos
+    loop.create_task(periodic_task(10 * 60))  # Ejecutar la tarea cada 10 minutos
     loop.run_forever()     
     
     
